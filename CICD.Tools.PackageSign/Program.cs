@@ -145,7 +145,7 @@
             }
             catch (Exception e)
             {
-                logger.LogError($"Exception during Process Run: {e}");
+                logger.LogError($"Exception during VerifyInternalAsync Run: {e}");
                 return 1;
             }
             finally
@@ -209,7 +209,7 @@
             }
             catch (Exception e)
             {
-                logger.LogError($"Exception during Process Run: {e}");
+                logger.LogError($"Exception during SignInternalAsync Run: {e}");
                 return 1;
             }
             finally

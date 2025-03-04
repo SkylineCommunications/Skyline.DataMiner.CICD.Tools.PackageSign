@@ -119,7 +119,7 @@
                 int returnValue = result.Should().NotThrow().Subject;
                 if (logger.ErrorLogging.Count > 0)
                 {
-                    Assert.Fail($"Error Logging: {String.Join(Environment.NewLine, logger.ErrorLogging)}");
+                    Assert.Fail($"Logging: {String.Join(Environment.NewLine, logger.Logging)}");
                 }
 
                 returnValue.Should().Be(0);
