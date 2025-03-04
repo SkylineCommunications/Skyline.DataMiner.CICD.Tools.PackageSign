@@ -57,3 +57,55 @@ jobs:
       sonarCloudToken: ${{ secrets.SONAR_TOKEN }}
       pfxPassword: ${{ secrets.PFXPASSWORD }}
       nugetApiKey: ${{ secrets.NUGETAPIKEY }}
+
+
+  validate_skyline_quality_gate:
+    name: Skyline Quality Gate 
+    runs-on: ubuntu-latest
+    outputs:
+      quality: ${{ steps.quality-step.outputs.results }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Building
+        run: dotnet build -p:DefineConstants="DCFv1%3BDBInfo%3BALARM_SQUASHING" --configuration Release -nodeReuse:false
+    
+      - uses: actions/upload-artifact@v4
+        with:
+          name: NugetPackages
+          path: "${{ github.workspace }}/_NuGetResults"
+
+        # Signing cannot be done from linux environment (https://github.com/dotnet/runtime/issues/48794)
+  sign:
+        # Don't run the signing when dependabot branch/pull request
+        if: ${{ github.actor != 'dependabot[bot]' }}
+        # The type of runner that the job will run on
+        runs-on: ubuntu-latest
+        needs: validate_skyline_quality_gate
+        env: 
+          AZURE_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+          AZURE_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+          AZURE_CLIENT_SECRET: ${{ secrets.AZURE_CLIENT_SECRET }}
+        steps:
+          - name: Download Unsigned NuGet
+            id: downloadUnsignedNuget
+            uses: actions/download-artifact@v4
+            with:
+              name: NugetPackages
+              path: _NuGetResults
+    
+          - name: Install dotnet sign
+            run: dotnet tool install sign --global --version 0.9.1-beta.24529.1
+          
+          - name: Sign NuGet Package
+            run: |       
+              IFS=$'\n'
+              sign code azure-key-vault "_NuGetResults/**/*.nupkg" --publisher-name "Skyline Communications" --description "Skyline Signing" --description-url "https://www.skyline.be/" --azure-key-vault-certificate "Skyline-CodeSigning" --azure-key-vault-url "https://kv-slc-codesigning.vault.azure.net/" --output "_SignedNuGetResults"
+              unset IFS    
+            shell: bash
+            
+          - uses: actions/upload-artifact@v4
+            with:
+              name: SignedNugetPackages
+              path: "${{ github.workspace }}/_SignedNuGetResults"

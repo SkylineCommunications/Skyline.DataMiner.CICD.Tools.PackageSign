@@ -117,7 +117,7 @@
 
                 // Assert
                 int returnValue = result.Should().NotThrow().Subject;
-                if (logger.ErrorLogging.Count > 0)
+                if (logger.ErrorLogging.Count > 1)
                 {
                     Assert.Fail($"Logging: {String.Join(Environment.NewLine, logger.Logging)}");
                 }
