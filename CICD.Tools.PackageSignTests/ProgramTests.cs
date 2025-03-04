@@ -117,6 +117,11 @@
 
                 // Assert
                 int returnValue = result.Should().NotThrow().Subject;
+                if (logger.ErrorLogging.Count > 0)
+                {
+                    Assert.Fail($"Error Logging: {String.Join(Environment.NewLine, logger.ErrorLogging)}");
+                }
+
                 returnValue.Should().Be(0);
                 string signedPackageLocation = FileSystem.Instance.Path.Combine(temporaryDirectory, "Project7.1.0.0.dmapp");
                 FileSystem.Instance.File.Exists(signedPackageLocation).Should().BeTrue();
