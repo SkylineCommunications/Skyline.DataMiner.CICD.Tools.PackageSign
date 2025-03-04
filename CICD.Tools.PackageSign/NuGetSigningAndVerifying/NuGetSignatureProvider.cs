@@ -82,7 +82,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
             logger.LogInformation($"{nameof(CreateAuthorSignatureAsync)}: Retrieving certificate chain");
             const string PropertyName = "Chain";
 
-            PropertyInfo? property = typeof(SignPackageRequest)
+            PropertyInfo property = typeof(SignPackageRequest)
                 .GetProperty(PropertyName, BindingFlags.Instance | BindingFlags.NonPublic);
 
             if (property is null)
@@ -90,14 +90,14 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
                 throw new MissingMemberException(nameof(SignPackageRequest), PropertyName);
             }
 
-            MethodInfo? getter = property.GetGetMethod(nonPublic: true);
+            MethodInfo getter = property.GetGetMethod(nonPublic: true);
 
             if (getter is null)
             {
                 throw new MissingMemberException(nameof(SignPackageRequest), PropertyName);
             }
 
-            var certificates = (IReadOnlyList<X509Certificate2>?)getter.Invoke(request, parameters: null);
+            var certificates = (IReadOnlyList<X509Certificate2>)getter.Invoke(request, parameters: null);
             logger.LogInformation($"{nameof(CreateAuthorSignatureAsync)}: Retrieved certificate chain");
             
             logger.LogInformation($"{nameof(CreateAuthorSignatureAsync)}: Computing signature");

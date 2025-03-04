@@ -5,6 +5,7 @@
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dataminer-package</ToolCommandName>
     <ImplicitUsings>disable</ImplicitUsings>
+    <Nullable>disable</Nullable>
     <AssemblyName>Skyline.DataMiner.CICD.Tools.PackageSign</AssemblyName>
     <RootNamespace>Skyline.DataMiner.CICD.Tools.PackageSign</RootNamespace>
     <PackageVersion>1.0.1</PackageVersion>

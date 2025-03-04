@@ -10,6 +10,8 @@
         public static string ConvertToDmapp(string path, string outputDirectory, string fileName)
         {
             ArgumentNullException.ThrowIfNull(path, nameof(path));
+            ArgumentNullException.ThrowIfNull(outputDirectory, nameof(outputDirectory));
+            ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
 
             string extension = FileSystem.Instance.Path.GetExtension(path);
 
@@ -23,9 +25,10 @@
             return newPath;
         }
 
-        public static string ConvertToNupgk(string path, string outputDirectory = null)
+        public static string ConvertToNupgk(string path, string outputDirectory)
         {
             ArgumentNullException.ThrowIfNull(path, nameof(path));
+            ArgumentNullException.ThrowIfNull(outputDirectory, nameof(outputDirectory));
 
             string extension = FileSystem.Instance.Path.GetExtension(path);
 
@@ -33,12 +36,7 @@
             {
                 throw new ArgumentException($"The file extension '{extension}' is not supported. Only '.dmapp' files are supported.");
             }
-
-            if (outputDirectory == null)
-            {
-                outputDirectory = FileSystem.Instance.Directory.CreateTemporaryDirectory();
-            }
-
+            
             string newPath = FileSystem.Instance.Path.Combine(outputDirectory, FileSystem.Instance.Path.GetFileNameWithoutExtension(path) + ".nupkg");
             FileSystem.Instance.File.Copy(path, newPath, true);
             return newPath;
@@ -46,6 +44,8 @@
 
         public static void AddNuspecFileToPackage(string path)
         {
+            ArgumentNullException.ThrowIfNull(path, nameof(path));
+
             string packageName = FileSystem.Instance.Path.GetFileNameWithoutExtension(path);
             using System.IO.FileStream fileStream = FileSystem.Instance.File.Open(path, System.IO.FileMode.Open);
             using ZipArchive archive = new ZipArchive(fileStream, ZipArchiveMode.Update);
