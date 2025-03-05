@@ -20,7 +20,7 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>SkylineCommunications</Authors>
     <Company>Skyline Communications</Company>
-    <Description>TBD</Description>
+    <Description>This .NET tool allows you to sign and verify DataMiner application (.dmapp) packages.</Description>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/SkylineCommunications/Skyline.DataMiner.CICD.Tools.PackageSign</RepositoryUrl>
   </PropertyGroup>

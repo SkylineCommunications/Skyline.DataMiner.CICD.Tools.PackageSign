@@ -11,7 +11,6 @@
     using Azure.Security.KeyVault.Keys.Cryptography;
 
     using Microsoft.Extensions.Configuration;
-    using Microsoft.Extensions.Logging;
 
     using NuGet.Packaging.Signing;
 
@@ -21,7 +20,7 @@
 
         public X509Certificate2 Certificate { get; private init; }
 
-        public static async Task<SignatureInfo> GetAsync(IConfiguration configuration, string certificateId, Uri url, ILogger logger)
+        public static async Task<SignatureInfo> GetAsync(IConfiguration configuration, string certificateId, Uri url)
         {
             string tenantId = configuration["AZURE_TENANT_ID"];
             string clientId = configuration["AZURE_CLIENT_ID"];

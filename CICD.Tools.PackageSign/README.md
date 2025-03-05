@@ -2,7 +2,7 @@
 
 ## About
 
-TBD
+This .NET tool allows you to sign and verify DataMiner application (.dmapp) packages.
 
 ### About DataMiner
 
@@ -22,8 +22,13 @@ At Skyline Communications, we deal in world-class solutions that are deployed by
 ## Getting Started
 
 In commandline:
+
+```
 dotnet tool install -g Skyline.DataMiner.CICD.Tools.PackageSign
+```
 
 Then run the command
-dataminer-package-sign help
 
+```
+dataminer-package help
+```

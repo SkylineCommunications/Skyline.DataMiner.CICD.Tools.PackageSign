@@ -67,7 +67,6 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
         public async Task<bool> VerifyAsync(string packagePath, SignatureInfo signatureInfo)
         {
             ArgumentException.ThrowIfNullOrEmpty(packagePath, nameof(packagePath));
-            ArgumentNullException.ThrowIfNull(signatureInfo, nameof(signatureInfo));
 
             string packageFileName = FileSystem.Instance.Path.GetFileName(packagePath);
 
@@ -75,15 +74,25 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
 
             try
             {
-                var certificateFingerprintString = CertificateUtility.GetHashString(signatureInfo.Certificate, HashAlgorithmName.SHA256);
-                PackageSignatureVerifier packageSignatureVerifier = new PackageSignatureVerifier(new List<ISignatureVerificationProvider>
+                List<ISignatureVerificationProvider> signatureVerificationProviders =
+                [
+                    new IntegrityVerificationProvider(), // Check if package is tampered
+                    new SignatureTrustAndValidityVerificationProvider(), // Check if valid signature
+                ];
+
+                if (signatureInfo != null)
                 {
-                    new IntegrityVerificationProvider(),
-                    new AllowListVerificationProvider(new List<VerificationAllowListEntry>
+                    // Signature info is provided, add certificate to allow list so only this certificate is valid.
+                    var certificateFingerprintString = CertificateUtility.GetHashString(signatureInfo.Certificate, HashAlgorithmName.SHA256);
+                    AllowListVerificationProvider allowListVerificationProvider = new AllowListVerificationProvider(new List<VerificationAllowListEntry>
                     {
                         new CertificateHashAllowListEntry(VerificationTarget.Author, SignaturePlacement.PrimarySignature, certificateFingerprintString, HashAlgorithmName.SHA256),
-                    })
-                });
+                    });
+
+                    signatureVerificationProviders.Add(allowListVerificationProvider);
+                }
+
+                PackageSignatureVerifier packageSignatureVerifier = new PackageSignatureVerifier(signatureVerificationProviders);
 
                 using var packageReader = new PackageArchiveReader(packagePath);
                 var result = await packageSignatureVerifier.VerifySignaturesAsync(packageReader, SignedPackageVerifierSettings.GetVerifyCommandDefaultPolicy(), CancellationToken.None);

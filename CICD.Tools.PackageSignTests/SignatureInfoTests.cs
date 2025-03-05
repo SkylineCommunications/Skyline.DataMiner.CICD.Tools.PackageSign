@@ -37,7 +37,7 @@
             string url = configuration["azure-key-vault-url"];
 
             // Act
-            Func<SignatureInfo> func = () => SignatureInfo.GetAsync(configuration, certificateId, new Uri(url), null).WaitAndUnwrapException();
+            Func<SignatureInfo> func = () => SignatureInfo.GetAsync(configuration, certificateId, new Uri(url)).WaitAndUnwrapException();
 
             // Assert
             func.Should().NotThrow();

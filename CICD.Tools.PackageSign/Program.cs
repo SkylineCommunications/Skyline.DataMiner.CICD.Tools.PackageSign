@@ -15,7 +15,7 @@
     using ILogger = Microsoft.Extensions.Logging.ILogger;
 
     /// <summary>
-    /// TBD.
+    /// This .NET tool allows you to sign and verify DataMiner application (.dmapp) packages.
     /// </summary>
     public static class Program
     {
@@ -66,6 +66,11 @@
                 // Path is correct
             });
 
+            var rootCommand = new RootCommand("This .NET tool allows you to sign and verify DataMiner application (.dmapp) packages.");
+            rootCommand.AddGlobalOption(isDebug);
+
+            #region SignCommand
+
             Option<Uri> urlOption = new(["--azure-key-vault-url", "-kvu"], "URL to an Azure Key Vault.")
             {
                 IsRequired = true,
@@ -79,9 +84,6 @@
                 IsRequired = true,
             };
             
-            var rootCommand = new RootCommand("This .NET tool allows you to sign and verify DataMiner application (.dmapp) packages.");
-            rootCommand.AddGlobalOption(isDebug);
-
             var signCommand = new Command("sign", "Signs a DataMiner application (.dmapp) package.")
             {
                 dmappLocation,
@@ -89,19 +91,26 @@
                 certificateOption,
                 outputOption
             };
+            signCommand.SetHandler(SignAsync, isDebug, dmappLocation, certificateOption, urlOption, outputOption);
+            rootCommand.AddCommand(signCommand);
+
+            #endregion
+
+            #region VerifyCommand
+            
+            Option<Uri> nonRequiredUrlOption = new(["--azure-key-vault-url", "-kvu"], "URL to an Azure Key Vault.");
+            Option<string> nonRequiredCertificateOption = new(["--azure-key-vault-certificate", "-kvc"], "Name of the certificate in Azure Key Vault.");
 
             var verifyCommand = new Command("verify", "Verifies a DataMiner application (.dmapp) package.")
             {
                 dmappLocation,
-                urlOption,
-                certificateOption,
+                nonRequiredCertificateOption,
+                nonRequiredUrlOption,
             };
+            verifyCommand.SetHandler(VerifyAsync, isDebug, dmappLocation, nonRequiredCertificateOption, nonRequiredUrlOption);
+            rootCommand.AddCommand(verifyCommand);
 
-
-            signCommand.SetHandler(SignAsync, isDebug, dmappLocation, certificateOption, urlOption, outputOption);
-            verifyCommand.SetHandler(VerifyAsync, isDebug, dmappLocation, certificateOption, urlOption);
-
-            rootCommand.AddCommand(signCommand);
+            #endregion
 
             return await rootCommand.InvokeAsync(args);
         }
@@ -128,7 +137,12 @@
 
             try
             {
-                SignatureInfo signatureInfo = await SignatureInfo.GetAsync(configuration, certificateId, url, logger);
+                SignatureInfo signatureInfo = null;
+                if (!String.IsNullOrWhiteSpace(certificateId) || url != null)
+                {
+                    // Certificate has been passed along, so verifying against the provided certificate.
+                    signatureInfo = await SignatureInfo.GetAsync(configuration, certificateId, url);
+                }
 
                 string nupgkFilePath = DmappConverter.ConvertToNupgk(dmappLocation, temporaryDirectory);
                 var verifier = new NuGetPackageSignerAndVerifier(logger);
@@ -179,14 +193,22 @@
                 string packageName = FileSystem.Instance.Path.GetFileNameWithoutExtension(dmappLocation);
                 if (await VerifyInternalAsync(configuration, dmappLocation, certificateId, url, logger) == 0)
                 {
-                    // Already signed, move to output directory
+                    // Already signed with provided certificate, move to output directory
+                    FileSystem.Instance.File.Copy(dmappLocation, FileSystem.Instance.Path.Combine(outputPath, $"{packageName}.dmapp"));
+                    return 0;
+                }
+
+                if (await VerifyInternalAsync(configuration, dmappLocation, null, null, logger) == 0)
+                {
+                    // Already signed with a certificate, move to output directory and throw warning
+                    logger.LogWarning($"The package '{dmappLocation}' is already signed with a certificate that does not match with the provided certificate.");
                     FileSystem.Instance.File.Copy(dmappLocation, FileSystem.Instance.Path.Combine(outputPath, $"{packageName}.dmapp"));
                     return 0;
                 }
 
                 // TODO: See if it's worth it to add a check if the package already has a nuspec file (previous signing that went wrong or trying to resign with different certificate)
 
-                SignatureInfo signatureInfo = await SignatureInfo.GetAsync(configuration, certificateId, url, logger);
+                SignatureInfo signatureInfo = await SignatureInfo.GetAsync(configuration, certificateId, url);
                 
                 string nupgkFilePath = DmappConverter.ConvertToNupgk(dmappLocation, temporaryDirectory);
                 DmappConverter.AddNuspecFileToPackage(nupgkFilePath);
