@@ -84,7 +84,7 @@
                 IsRequired = true,
             };
 
-            var signCommand = new Command("Signs a DataMiner application (.dmapp) package. Requires the environment variables AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET for authentication.")
+            var signCommand = new Command("sign", "Signs a DataMiner application (.dmapp) package. Requires the environment variables AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET for authentication.")
             {
                 dmappLocation,
                 urlOption,
