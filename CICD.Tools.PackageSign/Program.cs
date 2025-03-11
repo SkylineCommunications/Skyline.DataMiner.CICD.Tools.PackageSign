@@ -124,8 +124,17 @@
             {
                 ILogger logger = GetLogger(isDebug);
                 IConfiguration configuration = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+                var result = await VerifyInternalAsync(configuration, dmappLocation.FullName, certificateId, url, logger);
+                if (result == 0)
+                {
+                    logger.LogInformation($"Successfully verified the signed dmapp package: '{dmappLocation}'");
+                }
+                else
+                {
+                    logger.LogError($"Failed to verify the package: {dmappLocation}");
+                }
 
-                return await VerifyInternalAsync(configuration, dmappLocation.FullName, certificateId, url, logger);
+                return result;
             }
             catch (Exception e)
             {
@@ -156,7 +165,7 @@
                 }
                 else
                 {
-                    logger.LogError($"Failed to verify the package: {dmappLocation}");
+                    logger.LogDebug($"Failed to verify the package: {dmappLocation}");
                     return 1;
                 }
             }
@@ -177,8 +186,18 @@
             {
                 ILogger logger = GetLogger(isDebug);
                 IConfiguration configuration = new ConfigurationBuilder().AddEnvironmentVariables().Build();
+                var result = await SignInternalAsync(configuration, dmappLocation.FullName, certificateId, url, outputPath.FullName, logger);
 
-                return await SignInternalAsync(configuration, dmappLocation.FullName, certificateId, url, outputPath.FullName, logger);
+                if (result == 0)
+                {
+                    logger.LogInformation($"Created signed dmapp package '{dmappLocation.Name}' at '{outputPath.FullName}'");
+                }
+                else
+                {
+                    logger.LogError($"Failed to sign the package: {dmappLocation}");
+                }
+
+                return result;
             }
             catch (Exception e)
             {
@@ -228,7 +247,7 @@
                 }
                 else
                 {
-                    logger.LogError($"Failed to sign the package: {dmappLocation}");
+                    logger.LogDebug($"Failed to sign the package: {dmappLocation}");
                     return 1;
                 }
             }

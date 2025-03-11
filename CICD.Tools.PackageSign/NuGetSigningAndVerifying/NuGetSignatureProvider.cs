@@ -66,20 +66,20 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
             ArgumentNullException.ThrowIfNull(signatureContent, nameof(signatureContent));
             ArgumentNullException.ThrowIfNull(logger, nameof(logger));
 
-            logger.LogInformation($"{nameof(CreateAuthorSignatureAsync)}: Creating primary signature");
+            logger.LogDebug($"{nameof(CreateAuthorSignatureAsync)}: Creating primary signature");
             PrimarySignature authorSignature = CreatePrimarySignature(request, signatureContent, logger);
-            logger.LogInformation($"{nameof(CreateAuthorSignatureAsync)}: Primary signature completed");
+            logger.LogDebug($"{nameof(CreateAuthorSignatureAsync)}: Primary signature completed");
 
-            logger.LogInformation($"{nameof(CreateAuthorSignatureAsync)}: Timestamping primary signature");
+            logger.LogDebug($"{nameof(CreateAuthorSignatureAsync)}: Timestamping primary signature");
             PrimarySignature timestampedAuthorSignature = await TimestampPrimarySignatureAsync(request, logger, authorSignature, token);
-            logger.LogInformation($"{nameof(CreateAuthorSignatureAsync)}: Timestamping completed");
+            logger.LogDebug($"{nameof(CreateAuthorSignatureAsync)}: Timestamping completed");
 
             return timestampedAuthorSignature;
         }
 
         private PrimarySignature CreatePrimarySignature(AuthorSignPackageRequest request, SignatureContent signatureContent, ILogger logger)
         {
-            logger.LogInformation($"{nameof(CreateAuthorSignatureAsync)}: Retrieving certificate chain");
+            logger.LogDebug($"{nameof(CreateAuthorSignatureAsync)}: Retrieving certificate chain");
             const string PropertyName = "Chain";
 
             PropertyInfo property = typeof(SignPackageRequest)
@@ -98,9 +98,9 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
             }
 
             var certificates = (IReadOnlyList<X509Certificate2>)getter.Invoke(request, parameters: null);
-            logger.LogInformation($"{nameof(CreateAuthorSignatureAsync)}: Retrieved certificate chain");
+            logger.LogDebug($"{nameof(CreateAuthorSignatureAsync)}: Retrieved certificate chain");
             
-            logger.LogInformation($"{nameof(CreateAuthorSignatureAsync)}: Computing signature");
+            logger.LogDebug($"{nameof(CreateAuthorSignatureAsync)}: Computing signature");
             CmsSigner cmsSigner = CreateCmsSigner(request, certificates!);
             ContentInfo contentInfo = new(signatureContent.GetBytes());
             SignedCms signedCms = new(contentInfo);

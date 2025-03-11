@@ -39,7 +39,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
 
             string packageFileName = FileSystem.Instance.Path.GetFileName(packagePath);
 
-            _logger.LogInformation($"{nameof(SignAsync)} [{packagePath}]: Begin signing {packageFileName}");
+            _logger.LogDebug($"{nameof(SignAsync)} [{packagePath}]: Begin signing {packageFileName}");
 
             try
             {
@@ -58,7 +58,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
             }
             finally
             {
-                _logger.LogInformation($"{nameof(SignAsync)} [{packagePath}]: End signing {packageFileName}");
+                _logger.LogDebug($"{nameof(SignAsync)} [{packagePath}]: End signing {packageFileName}");
             }
 
             return true;
@@ -70,7 +70,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
 
             string packageFileName = FileSystem.Instance.Path.GetFileName(packagePath);
 
-            _logger.LogInformation($"{nameof(VerifyAsync)} [{packagePath}]: Begin verifying {packageFileName}");
+            _logger.LogDebug($"{nameof(VerifyAsync)} [{packagePath}]: Begin verifying {packageFileName}");
 
             try
             {
@@ -97,7 +97,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
                 using var packageReader = new PackageArchiveReader(packagePath);
                 var result = await packageSignatureVerifier.VerifySignaturesAsync(packageReader, SignedPackageVerifierSettings.GetVerifyCommandDefaultPolicy(), CancellationToken.None);
 
-                _logger.LogInformation($"{nameof(VerifyAsync)} [{packagePath}]: Verified {packageFileName}. IsSigned: {result.IsSigned} IsValid: {result.IsValid}");
+                _logger.LogDebug($"{nameof(VerifyAsync)} [{packagePath}]: Verified {packageFileName}. IsSigned: {result.IsSigned} IsValid: {result.IsValid}");
                 return result.IsSigned && result.IsValid;
             }
             catch (Exception e)
@@ -107,7 +107,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
             }
             finally
             {
-                _logger.LogInformation($"{nameof(VerifyAsync)} [{packagePath}]: End verifying {packageFileName}");
+                _logger.LogDebug($"{nameof(VerifyAsync)} [{packagePath}]: End verifying {packageFileName}");
             }
         }
     }
