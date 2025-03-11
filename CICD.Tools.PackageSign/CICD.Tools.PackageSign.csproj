@@ -3,7 +3,7 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <PackAsTool>true</PackAsTool>
-    <ToolCommandName>dataminer-package</ToolCommandName>
+    <ToolCommandName>dataminer-package-signature</ToolCommandName>
     <ImplicitUsings>disable</ImplicitUsings>
     <Nullable>disable</Nullable>
     <AssemblyName>Skyline.DataMiner.CICD.Tools.PackageSign</AssemblyName>

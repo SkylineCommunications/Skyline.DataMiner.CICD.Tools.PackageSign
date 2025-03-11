@@ -66,7 +66,7 @@
                 // Path is correct
             });
 
-            var rootCommand = new RootCommand("This .NET tool allows you to sign and verify DataMiner application (.dmapp) packages.");
+            var rootCommand = new RootCommand("This .NET tool signs and verifies DataMiner application (.dmapp) packages using a code-signing certificate stored in Azure Key Vault. Authentication to Azure requires the AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET environment variables. The certificate is selected through command arguments.");
             rootCommand.AddGlobalOption(isDebug);
 
             #region SignCommand
@@ -83,30 +83,33 @@
             {
                 IsRequired = true,
             };
-            
-            var signCommand = new Command("sign", "Signs a DataMiner application (.dmapp) package.")
+
+            var signCommand = new Command("Signs a DataMiner application (.dmapp) package. Requires the environment variables AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET for authentication.")
             {
                 dmappLocation,
                 urlOption,
                 certificateOption,
                 outputOption
             };
+
             signCommand.SetHandler(SignAsync, isDebug, dmappLocation, certificateOption, urlOption, outputOption);
             rootCommand.AddCommand(signCommand);
 
             #endregion
 
             #region VerifyCommand
-            
+
             Option<Uri> nonRequiredUrlOption = new(["--azure-key-vault-url", "-kvu"], "URL to an Azure Key Vault.");
             Option<string> nonRequiredCertificateOption = new(["--azure-key-vault-certificate", "-kvc"], "Name of the certificate in Azure Key Vault.");
 
-            var verifyCommand = new Command("verify", "Verifies a DataMiner application (.dmapp) package.")
+            var verifyCommand = new Command("verify", "Verifies that a DataMiner application (.dmapp) package is signed. If the environment variables AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET are set, the signature is validated against the specified certificate. If not provided, the command only checks if the package is signed, without verifying the owner.")
             {
                 dmappLocation,
                 nonRequiredCertificateOption,
                 nonRequiredUrlOption,
             };
+
+
             verifyCommand.SetHandler(VerifyAsync, isDebug, dmappLocation, nonRequiredCertificateOption, nonRequiredUrlOption);
             rootCommand.AddCommand(verifyCommand);
 
@@ -209,7 +212,7 @@
                 // TODO: See if it's worth it to add a check if the package already has a nuspec file (previous signing that went wrong or trying to resign with different certificate)
 
                 SignatureInfo signatureInfo = await SignatureInfo.GetAsync(configuration, certificateId, url);
-                
+
                 string nupgkFilePath = DmappConverter.ConvertToNupgk(dmappLocation, temporaryDirectory);
                 DmappConverter.AddNuspecFileToPackage(nupgkFilePath);
 

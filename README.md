@@ -2,7 +2,7 @@
 
 ## About
 
-TBD
+This .NET tool allows you to sign and verify DataMiner application (.dmapp) packages.
 
 ## Projects
 
@@ -22,6 +22,3 @@ A unique catalog of 7000+ connectors already exists. In addition, you can levera
 ### About Skyline Communications
 
 At Skyline Communications, we deal with world-class solutions that are deployed by leading companies around the globe. Check out [our proven track record](https://aka.dataminer.services/about-skyline) and see how we make our customers' lives easier by empowering them to take their operations to the next level.
-
-<!-- Uncomment below and add more info to provide more information about how to use this package. -->
-<!-- ## Getting Started -->
