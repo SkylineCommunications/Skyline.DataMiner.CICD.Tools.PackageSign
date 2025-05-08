@@ -2,6 +2,7 @@
 {
     using System;
     using System.CommandLine;
+    using System.Runtime.InteropServices;
     using System.Threading.Tasks;
 
     using Microsoft.Extensions.Configuration;
@@ -66,7 +67,7 @@
                 // Path is correct
             });
 
-            var rootCommand = new RootCommand("This .NET tool signs and verifies DataMiner application (.dmapp) packages using a code-signing certificate stored in Azure Key Vault. Authentication to Azure requires the AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET environment variables. The certificate is selected through command arguments.");
+            var rootCommand = new RootCommand("This .NET tool signs and verifies DataMiner application (.dmapp) packages using a code-signing certificate stored in Azure Key Vault. Authentication to Azure requires the AZURE_TENANT_ID, AZURE_CLIENT_ID, and AZURE_CLIENT_SECRET environment variables. The certificate is selected through command arguments. This is a Windows-Only tool.");
             rootCommand.AddGlobalOption(isDebug);
 
             #region SignCommand
@@ -118,10 +119,20 @@
             return await rootCommand.InvokeAsync(args);
         }
 
+        private static void CheckOs()
+        {
+            if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
+            {
+                throw new InvalidOperationException("This tool is only supported on Windows.");
+            }
+        }
+
         private static async Task<int> VerifyAsync(bool isDebug, System.IO.FileInfo dmappLocation, string certificateId, Uri url)
         {
             try
             {
+                CheckOs();
+
                 ILogger logger = GetLogger(isDebug);
                 IConfiguration configuration = new ConfigurationBuilder().AddEnvironmentVariables().Build();
                 var result = await VerifyInternalAsync(configuration, dmappLocation.FullName, certificateId, url, logger);
@@ -184,6 +195,8 @@
         {
             try
             {
+                CheckOs();
+
                 ILogger logger = GetLogger(isDebug);
                 IConfiguration configuration = new ConfigurationBuilder().AddEnvironmentVariables().Build();
                 var result = await SignInternalAsync(configuration, dmappLocation.FullName, certificateId, url, outputPath.FullName, logger);
