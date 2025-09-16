@@ -1,11 +1,11 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
     <TargetFramework>net8.0</TargetFramework>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dataminer-package-signature</ToolCommandName>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <AssemblyName>Skyline.DataMiner.CICD.Tools.PackageSign</AssemblyName>
     <RootNamespace>Skyline.DataMiner.CICD.Tools.PackageSign</RootNamespace>
     <PackageVersion>1.0.1</PackageVersion>
@@ -24,6 +24,11 @@
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/SkylineCommunications/Skyline.DataMiner.CICD.Tools.PackageSign</RepositoryUrl>
   </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Commands\NewFolder\**" />
+    <EmbeddedResource Remove="Commands\NewFolder\**" />
+    <None Remove="Commands\NewFolder\**" />
+  </ItemGroup>
 
   <ItemGroup>
     <None Include="README.md" Pack="true" PackagePath="" />
@@ -36,17 +41,34 @@
     <PackageReference Include="Azure.Security.KeyVault.Certificates" Version="4.7.0" />
     <PackageReference Include="Azure.Security.KeyVault.Keys" Version="4.7.0" />
     <PackageReference Include="Microsoft.Extensions.Azure" Version="1.11.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.4" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.6" />
     <PackageReference Include="NuGet.Protocol" Version="6.13.2" />
-    <PackageReference Include="Serilog" Version="4.2.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Skyline.DataMiner.CICD.FileSystem" Version="1.4.0" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageReference Include="System.CommandLine.Hosting" Version="0.4.0-alpha.22272.1" />
   </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="CICD.Tools.PackageSignTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.Extensions.Configuration" />
+    <Using Include="Microsoft.Extensions.Logging" />
+    <Using Include="Skyline.DataMiner.CICD.FileSystem" />
+    <Using Include="Skyline.DataMiner.CICD.FileSystem.DirectoryInfoWrapper" />
+    <Using Include="Skyline.DataMiner.CICD.FileSystem.DirectoryInfoWrapper.DirectoryInfo">
+      <Alias>DirectoryInfo</Alias>
+    </Using>
+    <Using Include="Skyline.DataMiner.CICD.FileSystem.FileInfoWrapper" />
+    <Using Include="Skyline.DataMiner.CICD.FileSystem.FileInfoWrapper.FileInfo">
+      <Alias>FileInfo</Alias>
+    </Using>
+    <Using Include="Skyline.DataMiner.CICD.FileSystem.FileSystemInfoWrapper" />
+    <Using Include="System.CommandLine" />
+    <Using Include="System.CommandLine.Invocation" />
+    <Using Include="System.CommandLine.Parsing" />
   </ItemGroup>
 
 </Project>

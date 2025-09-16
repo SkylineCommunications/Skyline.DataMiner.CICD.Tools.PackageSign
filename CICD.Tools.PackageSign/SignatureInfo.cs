@@ -22,9 +22,9 @@
 
         public static async Task<SignatureInfo> GetAsync(IConfiguration configuration, string certificateId, Uri url)
         {
-            string tenantId = configuration["AZURE_TENANT_ID"];
-            string clientId = configuration["AZURE_CLIENT_ID"];
-            string clientSecret = configuration["AZURE_CLIENT_SECRET"];
+            string? tenantId = configuration["AZURE_TENANT_ID"];
+            string? clientId = configuration["AZURE_CLIENT_ID"];
+            string? clientSecret = configuration["AZURE_CLIENT_SECRET"];
 
             var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
 

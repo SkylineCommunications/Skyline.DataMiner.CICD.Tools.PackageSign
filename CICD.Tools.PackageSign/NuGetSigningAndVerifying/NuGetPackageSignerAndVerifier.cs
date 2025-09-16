@@ -39,7 +39,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
 
             string packageFileName = FileSystem.Instance.Path.GetFileName(packagePath);
 
-            _logger.LogDebug($"{nameof(SignAsync)} [{packagePath}]: Begin signing {packageFileName}");
+            _logger.LogDebug("{MethodName} [{PackagePath}]: Begin signing {PackageFileName}", nameof(SignAsync), packagePath, packageFileName);
 
             try
             {
@@ -53,24 +53,24 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
             }
             catch (Exception e)
             {
-                _logger.LogError(e, e.Message);
+                _logger.LogError(e, "Exception during signing.");
                 return false;
             }
             finally
             {
-                _logger.LogDebug($"{nameof(SignAsync)} [{packagePath}]: End signing {packageFileName}");
+                _logger.LogDebug("{MethodName} [{PackagePath}]: End signing {PackageFileName}", nameof(SignAsync), packagePath, packageFileName);
             }
 
             return true;
         }
 
-        public async Task<bool> VerifyAsync(string packagePath, SignatureInfo signatureInfo)
+        public async Task<bool> VerifyAsync(string packagePath, SignatureInfo? signatureInfo)
         {
             ArgumentException.ThrowIfNullOrEmpty(packagePath, nameof(packagePath));
 
             string packageFileName = FileSystem.Instance.Path.GetFileName(packagePath);
 
-            _logger.LogDebug($"{nameof(VerifyAsync)} [{packagePath}]: Begin verifying {packageFileName}");
+            _logger.LogDebug("{MethodName} [{PackagePath}]: Begin verifying {PackageFileName}", nameof(VerifyAsync), packagePath, packageFileName);
 
             try
             {
@@ -97,17 +97,17 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
                 using var packageReader = new PackageArchiveReader(packagePath);
                 var result = await packageSignatureVerifier.VerifySignaturesAsync(packageReader, SignedPackageVerifierSettings.GetVerifyCommandDefaultPolicy(), CancellationToken.None);
 
-                _logger.LogDebug($"{nameof(VerifyAsync)} [{packagePath}]: Verified {packageFileName}. IsSigned: {result.IsSigned} IsValid: {result.IsValid}");
-                return result.IsSigned && result.IsValid;
+                _logger.LogDebug("{MethodName} [{PackagePath}]: Verified {PackageFileName}. IsSigned: {ResultIsSigned} IsValid: {ResultIsValid}", nameof(VerifyAsync), packagePath, packageFileName, result.IsSigned, result.IsValid);
+                return result is { IsSigned: true, IsValid: true };
             }
             catch (Exception e)
             {
-                _logger.LogError(e, e.Message);
+                _logger.LogError(e, "Exception during verification.");
                 return false;
             }
             finally
             {
-                _logger.LogDebug($"{nameof(VerifyAsync)} [{packagePath}]: End verifying {packageFileName}");
+                _logger.LogDebug("{MethodName} [{PackagePath}]: End verifying {PackageFileName}", nameof(VerifyAsync), packagePath, packageFileName);
             }
         }
     }
