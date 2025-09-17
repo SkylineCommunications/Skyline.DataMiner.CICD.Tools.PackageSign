@@ -33,11 +33,12 @@
             }
 
             // Arrange
-            string certificateId = configuration["azure-key-vault-certificate"];
-            string url = configuration["azure-key-vault-url"];
+            SigningZipVariables variables = new(configuration);
+            variables.SetAzureCredentials();
+            variables.SetAzureKeyVaultVariables();
 
             // Act
-            Func<SignatureInfo> func = () => SignatureInfo.GetAsync(configuration, certificateId, new Uri(url)).WaitAndUnwrapException();
+            Func<SignatureInfo> func = () => SignatureInfo.GetAsync(variables).WaitAndUnwrapException();
 
             // Assert
             func.Should().NotThrow();

@@ -1,7 +1,7 @@
 ﻿// ReSharper disable UnusedMember.Global
 namespace Skyline.DataMiner.CICD.Tools.PackageSign.SystemCommandLine
 {
-    using FileSystem = Skyline.DataMiner.CICD.FileSystem.FileSystem;
+    using Skyline.DataMiner.CICD.FileSystem;
 
     internal static class OptionExtensions
     {

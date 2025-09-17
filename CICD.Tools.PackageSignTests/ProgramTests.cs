@@ -10,6 +10,7 @@
     using Skyline.DataMiner.CICD.FileSystem;
     using Skyline.DataMiner.CICD.FileSystem.DirectoryInfoWrapper;
     using Skyline.DataMiner.CICD.FileSystem.FileInfoWrapper;
+    using Skyline.DataMiner.CICD.Tools.PackageSign;
     using Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign;
     using Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Verify;
 
@@ -38,12 +39,13 @@
 
             // Arrange
             var dmappLocation = new FileInfo(FileSystem.Instance.Path.Combine(TestHelper.GetTestFilesDirectory(), "Project7.1.0.0.dmapp"));
-            string certificateId = configuration["azure-key-vault-certificate"];
-            string url = configuration["azure-key-vault-url"];
+            SigningZipVariables variables = new(configuration);
+            variables.SetAzureCredentials();
+            variables.SetAzureKeyVaultVariables();
             var logger = TestHelper.GetTestLogger();
 
             // Act
-            Func<int> result = () => VerifyDmappCommandHandler.VerifyInternalAsync(configuration, dmappLocation, certificateId, new Uri(url), logger).WaitAndUnwrapException();
+            Func<int> result = () => VerifyDmappCommandHandler.VerifyInternalAsync(variables, dmappLocation, logger).WaitAndUnwrapException();
 
             // Assert
             int returnValue = result.Should().NotThrow().Subject;
@@ -61,12 +63,13 @@
 
             // Arrange
             var dmappLocation = new FileInfo(FileSystem.Instance.Path.Combine(TestHelper.GetTestFilesDirectory(), "Project7.1.0.0_SignedButModified.dmapp"));
-            string certificateId = configuration["azure-key-vault-certificate"];
-            string url = configuration["azure-key-vault-url"];
+            SigningZipVariables variables = new(configuration);
+            variables.SetAzureCredentials();
+            variables.SetAzureKeyVaultVariables();
             var logger = TestHelper.GetTestLogger();
 
             // Act
-            Func<int> result = () => VerifyDmappCommandHandler.VerifyInternalAsync(configuration, dmappLocation, certificateId, new Uri(url), logger).WaitAndUnwrapException();
+            Func<int> result = () => VerifyDmappCommandHandler.VerifyInternalAsync(variables, dmappLocation, logger).WaitAndUnwrapException();
 
             // Assert
             int returnValue = result.Should().NotThrow().Subject;
@@ -84,12 +87,13 @@
 
             // Arrange
             var dmappLocation = new FileInfo(FileSystem.Instance.Path.Combine(TestHelper.GetTestFilesDirectory(), "Project7.1.0.0_Signed.dmapp"));
-            string certificateId = configuration["azure-key-vault-certificate"];
-            string url = configuration["azure-key-vault-url"];
+            SigningZipVariables variables = new(configuration);
+            variables.SetAzureCredentials();
+            variables.SetAzureKeyVaultVariables();
             var logger = TestHelper.GetTestLogger();
 
             // Act
-            Func<int> result = () => VerifyDmappCommandHandler.VerifyInternalAsync(configuration, dmappLocation, certificateId, new Uri(url), logger).WaitAndUnwrapException();
+            Func<int> result = () => VerifyDmappCommandHandler.VerifyInternalAsync(variables, dmappLocation, logger).WaitAndUnwrapException();
 
             // Assert
             int returnValue = result.Should().NotThrow().Subject;
@@ -109,14 +113,15 @@
             // Arrange
             var temporaryDirectory = new DirectoryInfo(FileSystem.Instance.Directory.CreateTemporaryDirectory());
             var dmappLocation = new FileInfo(FileSystem.Instance.Path.Combine(TestHelper.GetTestFilesDirectory(), "Project7.1.0.0.dmapp"));
-            string certificateId = configuration["azure-key-vault-certificate"];
-            string url = configuration["azure-key-vault-url"];
+            SigningZipVariables variables = new(configuration);
+            variables.SetAzureCredentials();
+            variables.SetAzureKeyVaultVariables();
             var logger = TestHelper.GetTestLogger();
 
             try
             {
                 // Act
-                Func<int> result = () => SignDmappCommandHandler.SignInternalAsync(configuration, dmappLocation, certificateId, new Uri(url), temporaryDirectory, logger).WaitAndUnwrapException();
+                Func<int> result = () => SignDmappCommandHandler.SignInternalAsync(variables, dmappLocation, temporaryDirectory, logger).WaitAndUnwrapException();
 
                 // Assert
                 int returnValue = result.Should().NotThrow().Subject;
@@ -124,7 +129,7 @@
                 var signedPackageLocation = new FileInfo(FileSystem.Instance.Path.Combine(temporaryDirectory.FullName, "Project7.1.0.0.dmapp"));
                 signedPackageLocation.Exists.Should().BeTrue();
                 
-                int verifyResult = VerifyDmappCommandHandler.VerifyInternalAsync(configuration, signedPackageLocation, certificateId, new Uri(url), logger).WaitAndUnwrapException();
+                int verifyResult = VerifyDmappCommandHandler.VerifyInternalAsync(variables, signedPackageLocation, logger).WaitAndUnwrapException();
                 verifyResult.Should().Be(0);
             }
             finally
@@ -145,14 +150,15 @@
             // Arrange
             var temporaryDirectory = new DirectoryInfo(FileSystem.Instance.Directory.CreateTemporaryDirectory());
             var dmappLocation = new FileInfo(FileSystem.Instance.Path.Combine(TestHelper.GetTestFilesDirectory(), "Project7.1.0.0_Signed.dmapp"));
-            string certificateId = configuration["azure-key-vault-certificate"];
-            string url = configuration["azure-key-vault-url"];
+            SigningZipVariables variables = new(configuration);
+            variables.SetAzureCredentials();
+            variables.SetAzureKeyVaultVariables();
             var logger = TestHelper.GetTestLogger();
 
             try
             {
                 // Act
-                Func<int> result = () => SignDmappCommandHandler.SignInternalAsync(configuration, dmappLocation, certificateId, new Uri(url), temporaryDirectory, logger).WaitAndUnwrapException();
+                Func<int> result = () => SignDmappCommandHandler.SignInternalAsync(variables, dmappLocation, temporaryDirectory, logger).WaitAndUnwrapException();
 
                 // Assert
                 int returnValue = result.Should().NotThrow().Subject;
@@ -160,7 +166,7 @@
                 var signedPackageLocation = new FileInfo(FileSystem.Instance.Path.Combine(temporaryDirectory.FullName, "Project7.1.0.0_Signed.dmapp"));
                 signedPackageLocation.Exists.Should().BeTrue();
 
-                int verifyResult = VerifyDmappCommandHandler.VerifyInternalAsync(configuration, signedPackageLocation, certificateId, new Uri(url), logger).WaitAndUnwrapException();
+                int verifyResult = VerifyDmappCommandHandler.VerifyInternalAsync(variables, signedPackageLocation, logger).WaitAndUnwrapException();
                 verifyResult.Should().Be(0);
             }
             finally

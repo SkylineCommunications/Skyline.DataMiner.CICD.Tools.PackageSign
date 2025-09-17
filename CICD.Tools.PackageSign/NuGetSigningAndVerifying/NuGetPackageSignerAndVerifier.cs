@@ -13,9 +13,10 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying
     using NuGet.Packaging.Signing;
 
     using Skyline.DataMiner.CICD.FileSystem;
+    using Skyline.DataMiner.CICD.Tools.PackageSign;
 
     using HashAlgorithmName = NuGet.Common.HashAlgorithmName;
-    using ILogger = Microsoft.Extensions.Logging.ILogger;
+    using ILogger = ILogger;
 
     internal sealed class NuGetPackageSignerAndVerifier
     {

@@ -8,14 +8,14 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Verify
     using Skyline.DataMiner.CICD.Tools.PackageSign;
     using Skyline.DataMiner.CICD.Tools.PackageSign.NuGetSigningAndVerifying;
 
-    internal class VerifyDmappCommand() : BaseCommand(
-        name: "dmapp",
-        description: "Verifies that a DataMiner application (.dmapp) package is signed." + Environment.NewLine +
+    internal class VerifyDmprotocolCommand() : BaseCommand(
+        name: "dmprotocol",
+        description: "Verifies that a DataMiner protocol (.dmprotocol) package is signed." + Environment.NewLine +
                      "Environment variables 'AZURE_TENANT_ID', 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET', 'AZURE_KEY_VAULT_URL' and 'AZURE_KEY_VAULT_CERTIFICATE' can be set or provided via the parameters." + Environment.NewLine +
                      "If the Azure Key Vault variables are set, the signature is validated against the specified certificate. If not provided, the command only checks if the package is signed, without verifying the owner." + Environment.NewLine +
                      "This is a Windows-Only command.");
 
-    internal class VerifyDmappCommandHandler(ILogger<VerifyDmappCommandHandler> logger, IConfiguration configuration) : BaseCommandHandler
+    internal class VerifyDmprotocolCommandHandler(ILogger<VerifyDmprotocolCommandHandler> logger, IConfiguration configuration) : BaseCommandHandler
     {
         /*
          * Automatic binding with System.CommandLine.NamingConventionBinder
@@ -25,7 +25,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Verify
         
         public override async Task<int> InvokeAsync(InvocationContext context)
         {
-            logger.LogDebug($"Starting {nameof(VerifyDmappCommand)}...");
+            logger.LogDebug($"Starting {nameof(VerifyDmprotocolCommand)}...");
 
             if (!RuntimeInformation.IsOSPlatform(OSPlatform.Windows))
             {
@@ -41,10 +41,10 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Verify
                 switch (PackageLocation)
                 {
                     case DirectoryInfo directory:
-                        packages = new List<IFileInfoIO>(directory.GetFiles("*.dmapp", SearchOption.TopDirectoryOnly));
+                        packages = new List<IFileInfoIO>(directory.GetFiles("*.dmprotocol", SearchOption.TopDirectoryOnly));
                         break;
                     case FileInfo file:
-                        if (file.Extension != ".dmapp")
+                        if (file.Extension != ".dmprotocol")
                         {
                             return (int)ExitCodes.InvalidFileType;
                         }
@@ -80,7 +80,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Verify
             finally
             {
                 temporaryDirectory.Delete(true);
-                logger.LogDebug($"Finished {nameof(VerifyDmappCommand)}.");
+                logger.LogDebug($"Finished {nameof(VerifyDmprotocolCommand)}.");
             }
         }
 

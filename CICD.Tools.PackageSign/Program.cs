@@ -77,7 +77,9 @@
                                             .AddEnvironmentVariables();
                     })
                     .UseCommandHandler<SignDmappCommand, SignDmappCommandHandler>()
-                    .UseCommandHandler<VerifyDmappCommand, VerifyDmappCommandHandler>();
+                    .UseCommandHandler<SignDmprotocolCommand, SignDmprotocolCommandHandler>()
+                    .UseCommandHandler<VerifyDmappCommand, VerifyDmappCommandHandler>()
+                    .UseCommandHandler<VerifyDmprotocolCommand, VerifyDmprotocolCommandHandler>();
             });
 
             return await builder.Build().InvokeAsync(args);

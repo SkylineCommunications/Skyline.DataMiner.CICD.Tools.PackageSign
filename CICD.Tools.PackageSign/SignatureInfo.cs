@@ -10,8 +10,6 @@
 
     using Azure.Security.KeyVault.Keys.Cryptography;
 
-    using Microsoft.Extensions.Configuration;
-
     using NuGet.Packaging.Signing;
 
     internal class SignatureInfo
@@ -20,16 +18,17 @@
 
         public X509Certificate2 Certificate { get; private init; }
 
-        public static async Task<SignatureInfo> GetAsync(IConfiguration configuration, string certificateId, Uri url)
+        public static async Task<SignatureInfo?> GetAsync(SigningZipVariables variables)
         {
-            string? tenantId = configuration["AZURE_TENANT_ID"];
-            string? clientId = configuration["AZURE_CLIENT_ID"];
-            string? clientSecret = configuration["AZURE_CLIENT_SECRET"];
+            if (variables.AzureKeyVaultUri == null || String.IsNullOrWhiteSpace(variables.AzureKeyVaultCertificate))
+            {
+                return null;
+            }
+            
+            var credential = new ClientSecretCredential(variables.AzureTenantId, variables.AzureClientId, variables.AzureClientSecret);
 
-            var credential = new ClientSecretCredential(tenantId, clientId, clientSecret);
-
-            var certificateClient = new CertificateClient(url, credential);
-            var certificate = await certificateClient.GetCertificateAsync(certificateId);
+            var certificateClient = new CertificateClient(variables.AzureKeyVaultUri, credential);
+            var certificate = await certificateClient.GetCertificateAsync(variables.AzureKeyVaultCertificate);
 
             var keyId = certificate.Value.KeyId;
             if (keyId == null)

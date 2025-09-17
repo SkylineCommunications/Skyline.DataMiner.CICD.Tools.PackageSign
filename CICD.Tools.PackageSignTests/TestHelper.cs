@@ -20,11 +20,11 @@
         }
     }
 
-    public class TestLogger : Microsoft.Extensions.Logging.ILogger
+    public class TestLogger : ILogger
     {
-        public List<string> ErrorLogging { get; } = new List<string>();
+        public List<string> ErrorLogging { get; } = [];
 
-        public List<string> Logging { get; } = new List<string>();
+        public List<string> Logging { get; } = [];
 
         public void Log<TState>(LogLevel logLevel, EventId eventId, TState state, Exception exception, Func<TState, Exception, string> formatter)
         {
