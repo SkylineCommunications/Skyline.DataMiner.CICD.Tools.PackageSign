@@ -14,6 +14,12 @@
 
     internal class SignatureInfo
     {
+        private SignatureInfo(RSA rsa, X509Certificate2 certificate)
+        {
+            Rsa = rsa;
+            Certificate = certificate;
+        }
+
         public RSA Rsa { get; private init; }
 
         public X509Certificate2 Certificate { get; private init; }
@@ -53,11 +59,7 @@
             }
 
             var rsa = await cryptoClient.CreateRSAAsync();
-            return new SignatureInfo
-            {
-                Certificate = x509Certificate2,
-                Rsa = rsa
-            };
+            return new SignatureInfo(rsa, x509Certificate2);
         }
     }
 }

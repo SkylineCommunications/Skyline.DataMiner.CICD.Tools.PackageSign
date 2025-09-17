@@ -2,7 +2,7 @@
 {
     internal class SigningZipVariables
     {
-        private readonly IConfiguration _configuration;
+        private readonly IConfiguration? _configuration;
 
         public SigningZipVariables(IConfiguration configuration)
         {
@@ -32,7 +32,7 @@
         {
             if (azureKeyVaultUri == null)
             {
-                var urlString = _configuration["AZURE_KEY_VAULT_URL"];
+                var urlString = _configuration!["AZURE_KEY_VAULT_URL"];
                 if (required && String.IsNullOrWhiteSpace(urlString))
                 {
                     throw new ArgumentException("Azure Key Vault URL is not provided. Please set the environment variable AZURE_KEY_VAULT_URL or provide it as a parameter.");
@@ -48,7 +48,7 @@
 
             if (String.IsNullOrWhiteSpace(azureKeyVaultCertificate))
             {
-                azureKeyVaultCertificate = _configuration["AZURE_KEY_VAULT_CERTIFICATE"];
+                azureKeyVaultCertificate = _configuration!["AZURE_KEY_VAULT_CERTIFICATE"];
 
                 if (required && String.IsNullOrWhiteSpace(azureKeyVaultCertificate))
                 {
@@ -65,17 +65,17 @@
         {
             if (String.IsNullOrWhiteSpace(tenantId))
             {
-                tenantId = _configuration["AZURE_TENANT_ID"];
+                tenantId = _configuration!["AZURE_TENANT_ID"];
             }
 
             if (String.IsNullOrWhiteSpace(clientId))
             {
-                clientId = _configuration["AZURE_CLIENT_ID"];
+                clientId = _configuration!["AZURE_CLIENT_ID"];
             }
 
             if (String.IsNullOrWhiteSpace(clientSecret))
             {
-                clientSecret = _configuration["AZURE_CLIENT_SECRET"];
+                clientSecret = _configuration!["AZURE_CLIENT_SECRET"];
             }
 
             if (required && (String.IsNullOrWhiteSpace(tenantId) || String.IsNullOrWhiteSpace(clientId) || String.IsNullOrWhiteSpace(clientSecret)))
@@ -96,27 +96,29 @@
 
     internal class SigningProtocolVariables(IConfiguration configuration) : SigningZipVariables(configuration)
     {
-        public string? Domain { get; set; }
+        private readonly IConfiguration _configuration = configuration;
 
-        public string Username { get; set; }
+        public string? Domain { get; private set; }
 
-        public string Password { get; set; }
+        public string? Username { get; private set; }
+
+        public string? Password { get; private set; }
 
         public void SetProtocolSigningCredentials(string? domain = null, string? username = null, string? password = null)
         {
             if (String.IsNullOrWhiteSpace(domain))
             {
-                domain = configuration["SIGNING_DOMAIN"];
+                domain = _configuration["SIGNING_DOMAIN"];
             }
 
             if (String.IsNullOrWhiteSpace(username))
             {
-                username = configuration["SIGNING_USERNAME"];
+                username = _configuration["SIGNING_USERNAME"];
             }
 
             if (String.IsNullOrWhiteSpace(password))
             {
-                password = configuration["SIGNING_PASSWORD"];
+                password = _configuration["SIGNING_PASSWORD"];
             }
 
             if (String.IsNullOrWhiteSpace(username) || String.IsNullOrWhiteSpace(password))

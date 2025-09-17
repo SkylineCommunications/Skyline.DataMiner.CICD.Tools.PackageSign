@@ -9,9 +9,9 @@
     {
         public static string ConvertToPackage(string path, string outputDirectory, string fileName)
         {
-            ArgumentNullException.ThrowIfNull(path, nameof(path));
-            ArgumentNullException.ThrowIfNull(outputDirectory, nameof(outputDirectory));
-            ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
+            ArgumentNullException.ThrowIfNull(path);
+            ArgumentNullException.ThrowIfNull(outputDirectory);
+            ArgumentNullException.ThrowIfNull(fileName);
 
             string pathExtension = FileSystem.Instance.Path.GetExtension(path);
 
@@ -27,8 +27,8 @@
 
         public static string ConvertToNupkg(string path, string outputDirectory)
         {
-            ArgumentNullException.ThrowIfNull(path, nameof(path));
-            ArgumentNullException.ThrowIfNull(outputDirectory, nameof(outputDirectory));
+            ArgumentNullException.ThrowIfNull(path);
+            ArgumentNullException.ThrowIfNull(outputDirectory);
 
             string extension = FileSystem.Instance.Path.GetExtension(path);
 
@@ -44,7 +44,7 @@
 
         public static void AddNuspecFileToPackage(string path)
         {
-            ArgumentNullException.ThrowIfNull(path, nameof(path));
+            ArgumentNullException.ThrowIfNull(path);
 
             string packageName = FileSystem.Instance.Path.GetFileNameWithoutExtension(path);
             using FileStream fileStream = FileSystem.Instance.File.Open(path, FileMode.Open);

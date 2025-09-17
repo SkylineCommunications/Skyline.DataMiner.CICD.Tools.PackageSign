@@ -17,7 +17,7 @@
     using Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Verify;
 
     /// <summary>
-    /// This .NET tool allows you to sign and verify DataMiner packages (.dmapp & .dmprotocol).
+    /// This .NET tool allows you to sign and verify DataMiner packages (.dmapp &amp; .dmprotocol).
     /// </summary>
     public static class Program
     {
