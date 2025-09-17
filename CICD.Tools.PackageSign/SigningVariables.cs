@@ -38,7 +38,7 @@
                     throw new ArgumentException("Azure Key Vault URL is not provided. Please set the environment variable AZURE_KEY_VAULT_URL or provide it as a parameter.");
                 }
 
-                if (!Uri.TryCreate(urlString, UriKind.Absolute, out azureKeyVaultUri))
+                if (!String.IsNullOrWhiteSpace(urlString) && !Uri.TryCreate(urlString, UriKind.Absolute, out azureKeyVaultUri))
                 {
                     throw new ArgumentException("Azure Key Vault URL is invalid.");
                 }
