@@ -12,7 +12,7 @@
                 parseArgument: OptionHelper.ParseFileSystemInfo!)
             {
                 IsRequired = true
-            }!.ExistingOnly().LegalFilePathsOnly());
+            }.LegalFilePathsOnly()!.ExistingOnly());
 
             AddOption(new Option<string?>(
                 aliases: ["--azure-tenant-id", "-ati"],

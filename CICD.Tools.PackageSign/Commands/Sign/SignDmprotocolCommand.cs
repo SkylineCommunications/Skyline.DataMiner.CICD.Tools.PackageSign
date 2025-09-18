@@ -236,7 +236,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
         {
             try
             {
-                SignProtocolXmlFileResponse response = await client.SignProtocolXmlFileAsync(connectionGuid, await FileSystem.Instance.File.ReadAllBytesAsync(xmlFile));
+                SignProtocolXmlFileResponse response = await client.SignProtocolXmlFileAsync(connectionGuid, FileSystem.Instance.File.ReadAllBytes(xmlFile));
                 if (response?.Body?.SignProtocolXmlFileResult == null)
                 {
                     logger.LogError("Failed to get a valid response from the signing service.");
