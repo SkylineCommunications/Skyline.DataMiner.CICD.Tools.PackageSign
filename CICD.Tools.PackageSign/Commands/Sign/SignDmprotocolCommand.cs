@@ -163,7 +163,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                             
                 // Zip back as a package
                 string signedProtocolXmlPackageFilePath = FileSystem.Instance.Path.Combine(tempDir, packageFile.Name);
-                ZipFile.CreateFromDirectory(FileSystem.Instance.Path.Combine(unzipDirectory, String.Empty), signedProtocolXmlPackageFilePath);
+                ZipFile.CreateFromDirectory(unzipDirectory, signedProtocolXmlPackageFilePath);
 
                 // Sign package
                 int protocolPackageSignResult = await SignProtocolPackageInternalAsync(variables, new FileInfo(signedProtocolXmlPackageFilePath), Output, logger);
