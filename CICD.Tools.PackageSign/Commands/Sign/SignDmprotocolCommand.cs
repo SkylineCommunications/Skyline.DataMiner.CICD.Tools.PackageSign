@@ -27,11 +27,11 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                 description: "Domain of the account to connect to the Protocol Signing Service."));
 
             AddOption(new Option<string?>(
-                aliases: ["--username", "-"],
+                aliases: ["--username", "-u"],
                 description: "Username of the account to connect to the Protocol Signing Service."));
 
             AddOption(new Option<string?>(
-                aliases: ["--password", "-"],
+                aliases: ["--password", "-p"],
                 description: "Password of the account to connect to the Protocol Signing Service."));
 
             AddOption(new Option<IDirectoryInfoIO>(
