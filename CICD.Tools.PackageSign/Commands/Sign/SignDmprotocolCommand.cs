@@ -202,7 +202,12 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                     return (int)ExitCodes.Ok;
                 }
 
-                SignatureInfo signatureInfo = (await SignatureInfo.GetAsync(variables))!;
+                SignatureInfo signatureInfo = await SignatureInfo.GetAsync(variables);
+                if (signatureInfo == null)
+                {
+                    logger.LogError("Failed to retrieve signature information from Key Vault. Please check your configuration and try again.");
+                    return (int)ExitCodes.Fail;
+                }
 
                 string nupgkFilePath = PackageConverter.ConvertToNupkg(packageFile.FullName, temporaryDirectory);
                 PackageConverter.AddNuspecFileToPackage(nupgkFilePath);
