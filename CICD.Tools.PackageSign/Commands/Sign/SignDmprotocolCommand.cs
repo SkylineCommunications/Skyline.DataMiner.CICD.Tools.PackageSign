@@ -136,6 +136,11 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
 
             try
             {
+                if (await CheckIfAlreadySignedAsync(variables, packageFile, Output, logger))
+                {
+                    return true;
+                }
+
                 string unzipDirectory = FileSystem.Instance.Path.Combine(tempDir, "Unzip");
 
                 // Unzip package to temporary directory
@@ -164,7 +169,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                 ZipFile.CreateFromDirectory(unzipDirectory, signedProtocolXmlPackageFilePath);
 
                 // Sign package
-                int protocolPackageSignResult = await SignProtocolPackageInternalAsync(variables, new FileInfo(signedProtocolXmlPackageFilePath), Output, logger);
+                int protocolPackageSignResult = await SignProtocolPackageInternalAsync(variables, new FileInfo(signedProtocolXmlPackageFilePath), Output ?? packageFile.Directory, logger);
                 return protocolPackageSignResult == (int)ExitCodes.Ok;
             }
             catch (Exception e)
@@ -178,36 +183,41 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
             }
         }
 
-        internal static async Task<int> SignProtocolPackageInternalAsync(SigningZipVariables variables, IFileInfoIO packageFile, IDirectoryInfoIO? outputDirectory, ILogger logger)
+        private static async Task<bool> CheckIfAlreadySignedAsync(SigningZipVariables variables, IFileInfoIO packageFile,
+            IDirectoryInfoIO? outputDirectory, ILogger logger)
+        {
+            if (await VerifyDmprotocolCommandHandler.VerifyInternalAsync(variables, packageFile, logger) == (int)ExitCodes.Ok)
+            {
+                if (outputDirectory != null)
+                {
+                    // Already signed with provided certificate, move to output directory
+                    packageFile.CopyTo(FileSystem.Instance.Path.Combine(outputDirectory.FullName, packageFile.Name));
+                }
+
+                return true;
+            }
+
+            if (await VerifyDmprotocolCommandHandler.VerifyInternalAsync(variables.WithoutKeyVault(), packageFile, logger) == (int)ExitCodes.Ok)
+            {
+                if (outputDirectory != null)
+                {
+                    // Already signed with a certificate, move to output directory and throw warning
+                    logger.LogWarning("The package '{PackageName}' is already signed with a certificate that does not match with the provided certificate.", packageFile.Name);
+                    packageFile.CopyTo(FileSystem.Instance.Path.Combine(outputDirectory.FullName, packageFile.Name));
+                }
+
+                return true;
+            }
+
+            return false;
+        }
+
+        internal static async Task<int> SignProtocolPackageInternalAsync(SigningZipVariables variables, IFileInfoIO packageFile, IDirectoryInfoIO outputDirectory, ILogger logger)
         {
             string temporaryDirectory = FileSystem.Instance.Directory.CreateTemporaryDirectory();
 
             try
             {
-                string packageName = FileSystem.Instance.Path.GetFileNameWithoutExtension(packageFile.FullName);
-                if (await VerifyDmprotocolCommandHandler.VerifyInternalAsync(variables, packageFile, logger) == (int)ExitCodes.Ok)
-                {
-                    if (outputDirectory != null)
-                    {
-                        // Already signed with provided certificate, move to output directory
-                        packageFile.CopyTo(FileSystem.Instance.Path.Combine(outputDirectory.FullName, packageFile.Name));
-                    }
-
-                    return (int)ExitCodes.Ok;
-                }
-
-                if (await VerifyDmprotocolCommandHandler.VerifyInternalAsync(variables.WithoutKeyVault(), packageFile, logger) == (int)ExitCodes.Ok)
-                {
-                    if (outputDirectory != null)
-                    {
-                        // Already signed with a certificate, move to output directory and throw warning
-                        logger.LogWarning("The package '{PackageName}' is already signed with a certificate that does not match with the provided certificate.", packageFile.Name);
-                        packageFile.CopyTo(FileSystem.Instance.Path.Combine(outputDirectory.FullName, packageFile.Name));
-                    }
-
-                    return (int)ExitCodes.Ok;
-                }
-
                 SignatureInfo? signatureInfo = await SignatureInfo.GetAsync(variables);
                 if (signatureInfo == null)
                 {
@@ -219,10 +229,11 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                 PackageConverter.AddNuspecFileToPackage(nupgkFilePath);
 
                 var signer = new NuGetPackageSignerAndVerifier(logger);
+                string packageName = FileSystem.Instance.Path.GetFileNameWithoutExtension(packageFile.FullName);
                 string signedNupkgFilePath = FileSystem.Instance.Path.Combine(temporaryDirectory, packageName + "_Signed.nupkg");
                 if (await signer.SignAsync(nupgkFilePath, signedNupkgFilePath, signatureInfo, true))
                 {
-                    string packageFilePath = PackageConverter.ConvertToPackage(signedNupkgFilePath, outputDirectory?.FullName ?? packageFile.DirectoryName, packageFile.Name);
+                    string packageFilePath = PackageConverter.ConvertToPackage(signedNupkgFilePath, outputDirectory.FullName, packageFile.Name);
                     logger.LogDebug("Created signed package at '{PackageFilePath}'", packageFilePath);
                     return (int)ExitCodes.Ok;
                 }

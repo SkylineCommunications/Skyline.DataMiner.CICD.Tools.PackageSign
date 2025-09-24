@@ -6,7 +6,7 @@
         },
         "CICD.Tools.PackageSign": {
             "commandName": "Project",
-            "commandLineArgs": "sign dmprotocol\r\n--output \"%USERPROFILE%\\Downloads\\SignTest\\Result\"\r\n--package-location \"%USERPROFILE%\\Downloads\\SignTest\\BlaBla.dmprotocol\""
+            "commandLineArgs": "sign dmprotocol\r\n--package-location \"%USERPROFILE%\\Downloads\\SignTest\\BlaBla.dmprotocol\" --debug true"
         }
     }
 }
