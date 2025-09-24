@@ -97,7 +97,8 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                 variables.SetProtocolSigningCredentials(Domain, Username, Password);
                 await using (SoapSoapClient client = new SoapSoapClient(SoapSoapClient.EndpointConfiguration.SoapSoap))
                 {
-                    var connectionGuid = (await client.ConnectAsync(variables.Username, variables.Password, variables.Domain))?.Body?.ConnectResult;
+                    // Domain can't be null as the signing service requires it, but it can be empty.
+                    var connectionGuid = (await client.ConnectAsync(variables.Username, variables.Password, variables.Domain ?? String.Empty))?.Body?.ConnectResult;
 
                     if (String.IsNullOrWhiteSpace(connectionGuid))
                     {
