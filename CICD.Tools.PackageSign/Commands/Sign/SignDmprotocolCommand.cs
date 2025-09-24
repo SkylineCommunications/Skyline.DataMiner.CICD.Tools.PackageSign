@@ -105,7 +105,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                         logger.LogError("Invalid Authentication user ({Username}) for Skyline Signing Service: https://protocol.skyline.be", variables.Username);
                         return (int)ExitCodes.Fail;
                     }
-                    
+
                     foreach (IFileInfoIO packageFile in packages)
                     {
                         if (!await SignProtocolPackageAsync(packageFile, client, connectionGuid, variables))
@@ -158,7 +158,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                 {
                     return false;
                 }
-                            
+
                 // Zip back as a package
                 string signedProtocolXmlPackageFilePath = FileSystem.Instance.Path.Combine(tempDir, packageFile.Name);
                 ZipFile.CreateFromDirectory(unzipDirectory, signedProtocolXmlPackageFilePath);
