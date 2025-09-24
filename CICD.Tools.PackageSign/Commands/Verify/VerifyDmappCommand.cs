@@ -41,7 +41,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Verify
                 switch (PackageLocation)
                 {
                     case DirectoryInfo directory:
-                        packages = new List<IFileInfoIO>(directory.GetFiles("*.dmapp", SearchOption.TopDirectoryOnly));
+                        packages = new List<IFileInfoIO>(directory.GetFiles("*.dmapp", SearchOption.AllDirectories));
                         break;
                     case FileInfo file:
                         if (file.Extension != ".dmapp")

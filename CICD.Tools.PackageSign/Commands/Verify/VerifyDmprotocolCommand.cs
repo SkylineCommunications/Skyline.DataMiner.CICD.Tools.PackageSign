@@ -41,7 +41,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Verify
                 switch (PackageLocation)
                 {
                     case DirectoryInfo directory:
-                        packages = new List<IFileInfoIO>(directory.GetFiles("*.dmprotocol", SearchOption.TopDirectoryOnly));
+                        packages = new List<IFileInfoIO>(directory.GetFiles("*.dmprotocol", SearchOption.AllDirectories));
                         break;
                     case FileInfo file:
                         if (file.Extension != ".dmprotocol")

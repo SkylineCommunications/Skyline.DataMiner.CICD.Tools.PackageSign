@@ -34,13 +34,10 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                 aliases: ["--password", "-p"],
                 description: "Password of the account to connect to the Protocol Signing Service."));
 
-            AddOption(new Option<IDirectoryInfoIO>(
+            AddOption(new Option<IDirectoryInfoIO?>(
                 aliases: ["--output", "-o"],
-                description: "Output directory for the signed package(s).",
-                parseArgument: OptionHelper.ParseDirectoryInfo!)
-            {
-                IsRequired = true
-            }.LegalFilePathsOnly());
+                description: "Output directory for the signed package(s). If not provided, it will overwrite the provided file(s).",
+                parseArgument: OptionHelper.ParseDirectoryInfo).LegalFilePathsOnly());
         }
     }
 
@@ -58,7 +55,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
 
         public string? Password { get; set; }
 
-        public required IDirectoryInfoIO Output { get; set; }
+        public IDirectoryInfoIO? Output { get; set; }
 
         public override async Task<int> InvokeAsync(InvocationContext context)
         {
@@ -76,7 +73,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                 switch (PackageLocation)
                 {
                     case DirectoryInfo directory:
-                        packages = new List<IFileInfoIO>(directory.GetFiles("*.dmprotocol", SearchOption.TopDirectoryOnly));
+                        packages = new List<IFileInfoIO>(directory.GetFiles("*.dmprotocol", SearchOption.AllDirectories));
                         break;
                     case FileInfo file:
                         if (file.Extension != ".dmprotocol")
@@ -91,7 +88,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                         return (int)ExitCodes.Fail;
                 }
 
-                Output.Create();
+                Output?.Create();
 
                 bool hadError = false;
                 SigningProtocolVariables variables = new(configuration);
@@ -180,7 +177,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
             }
         }
 
-        internal static async Task<int> SignProtocolPackageInternalAsync(SigningZipVariables variables, IFileInfoIO packageFile, IDirectoryInfoIO outputDirectory, ILogger logger)
+        internal static async Task<int> SignProtocolPackageInternalAsync(SigningZipVariables variables, IFileInfoIO packageFile, IDirectoryInfoIO? outputDirectory, ILogger logger)
         {
             string temporaryDirectory = FileSystem.Instance.Directory.CreateTemporaryDirectory();
 
@@ -189,23 +186,31 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                 string packageName = FileSystem.Instance.Path.GetFileNameWithoutExtension(packageFile.FullName);
                 if (await VerifyDmprotocolCommandHandler.VerifyInternalAsync(variables, packageFile, logger) == (int)ExitCodes.Ok)
                 {
-                    // Already signed with provided certificate, move to output directory
-                    packageFile.CopyTo(FileSystem.Instance.Path.Combine(outputDirectory.FullName, packageFile.Name));
+                    if (outputDirectory != null)
+                    {
+                        // Already signed with provided certificate, move to output directory
+                        packageFile.CopyTo(FileSystem.Instance.Path.Combine(outputDirectory.FullName, packageFile.Name));
+                    }
+
                     return (int)ExitCodes.Ok;
                 }
 
                 if (await VerifyDmprotocolCommandHandler.VerifyInternalAsync(variables.WithoutKeyVault(), packageFile, logger) == (int)ExitCodes.Ok)
                 {
-                    // Already signed with a certificate, move to output directory and throw warning
-                    logger.LogWarning("The package '{PackageName}' is already signed with a certificate that does not match with the provided certificate.", packageFile.Name);
-                    packageFile.CopyTo(FileSystem.Instance.Path.Combine(outputDirectory.FullName, packageFile.Name));
+                    if (outputDirectory != null)
+                    {
+                        // Already signed with a certificate, move to output directory and throw warning
+                        logger.LogWarning("The package '{PackageName}' is already signed with a certificate that does not match with the provided certificate.", packageFile.Name);
+                        packageFile.CopyTo(FileSystem.Instance.Path.Combine(outputDirectory.FullName, packageFile.Name));
+                    }
+
                     return (int)ExitCodes.Ok;
                 }
 
-                SignatureInfo signatureInfo = await SignatureInfo.GetAsync(variables);
+                SignatureInfo? signatureInfo = await SignatureInfo.GetAsync(variables);
                 if (signatureInfo == null)
                 {
-                    logger.LogError("Failed to retrieve signature information from Key Vault. Please check your configuration and try again.");
+                    logger.LogError("Failed to retrieve signature information from Key Vault. Please ensure all required variables are set.");
                     return (int)ExitCodes.Fail;
                 }
 
@@ -216,7 +221,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                 string signedNupkgFilePath = FileSystem.Instance.Path.Combine(temporaryDirectory, packageName + "_Signed.nupkg");
                 if (await signer.SignAsync(nupgkFilePath, signedNupkgFilePath, signatureInfo, true))
                 {
-                    string packageFilePath = PackageConverter.ConvertToPackage(signedNupkgFilePath, outputDirectory.FullName, packageFile.Name);
+                    string packageFilePath = PackageConverter.ConvertToPackage(signedNupkgFilePath, outputDirectory?.FullName ?? packageFile.DirectoryName, packageFile.Name);
                     logger.LogDebug("Created signed package at '{PackageFilePath}'", packageFilePath);
                     return (int)ExitCodes.Ok;
                 }
