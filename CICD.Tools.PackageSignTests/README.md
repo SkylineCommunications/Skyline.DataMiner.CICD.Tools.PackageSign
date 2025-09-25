@@ -3,7 +3,10 @@
 ## About
 
 This project contains integration and unit tests for the **Skyline.DataMiner.CICD.Tools.PackageSign** tool.  
-The tests validate the signing and verification functionality of `.dmapp` packages using **Azure Key Vault** certificates.
+The tests validate the signing and verification functionality of `.dmapp` packages using **Azure Key Vault** certificates. 
+
+> **Note**  
+> Currently, the tests focus on `.dmapp` packages. The tool also supports `.dmprotocol` packages, but these are not covered by the current test suite.
 
 ## Prerequisites
 
