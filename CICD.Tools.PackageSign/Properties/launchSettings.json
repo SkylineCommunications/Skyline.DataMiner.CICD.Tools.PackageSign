@@ -1,0 +1,12 @@
+{
+    "profiles": {
+        "Help": {
+            "commandName": "Project",
+            "commandLineArgs": "-h"
+        },
+        "CICD.Tools.PackageSign": {
+            "commandName": "Project",
+            "commandLineArgs": "sign dmprotocol\r\n--package-location \"%USERPROFILE%\\Downloads\\SignTest\\BlaBla.dmprotocol\" --debug true"
+        }
+    }
+}

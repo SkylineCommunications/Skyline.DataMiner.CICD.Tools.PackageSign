@@ -4,12 +4,10 @@
     <TargetFramework>net8.0</TargetFramework>
     <PackAsTool>true</PackAsTool>
     <ToolCommandName>dataminer-package-signature</ToolCommandName>
-    <ImplicitUsings>disable</ImplicitUsings>
-    <Nullable>disable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
     <AssemblyName>Skyline.DataMiner.CICD.Tools.PackageSign</AssemblyName>
     <RootNamespace>Skyline.DataMiner.CICD.Tools.PackageSign</RootNamespace>
-    <PackageVersion>1.0.1</PackageVersion>
-    <Version>1.0.1</Version>
     <PackageTags>Skyline;DataMiner</PackageTags>
     <PackageProjectUrl>https://skyline.be</PackageProjectUrl>
     <PackageReadmeFile>README.md</PackageReadmeFile>
@@ -20,9 +18,10 @@
     <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
     <Authors>SkylineCommunications</Authors>
     <Company>Skyline Communications</Company>
-    <Description>This .NET tool allows you to sign and verify DataMiner application (.dmapp) packages.</Description>
+    <Description>This .NET tool allows you to sign and verify DataMiner packages (.dmapp &amp; .dmprotocol).</Description>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/SkylineCommunications/Skyline.DataMiner.CICD.Tools.PackageSign</RepositoryUrl>
+    <UserSecretsId>e0a93082-e7a7-4360-8de1-9949fd1df74b</UserSecretsId>
   </PropertyGroup>
 
   <ItemGroup>
@@ -32,21 +31,49 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Azure.Identity" Version="1.13.2" />
-    <PackageReference Include="Azure.Security.KeyVault.Certificates" Version="4.7.0" />
-    <PackageReference Include="Azure.Security.KeyVault.Keys" Version="4.7.0" />
-    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.11.0" />
-    <PackageReference Include="Microsoft.Extensions.Configuration.EnvironmentVariables" Version="9.0.4" />
-    <PackageReference Include="NuGet.Protocol" Version="6.13.2" />
-    <PackageReference Include="Serilog" Version="4.2.0" />
-    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.1" />
+    <PackageReference Include="Azure.Identity" Version="1.16.0" />
+    <PackageReference Include="Azure.Security.KeyVault.Certificates" Version="4.8.0" />
+    <PackageReference Include="Azure.Security.KeyVault.Keys" Version="4.8.0" />
+    <PackageReference Include="Microsoft.Extensions.ApiDescription.Client" Version="9.0.9">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="Microsoft.Extensions.Azure" Version="1.12.0" />
+    <PackageReference Include="Microsoft.Extensions.Hosting" Version="9.0.9" />
+    <PackageReference Include="NSwag.ApiDescription.Client" Version="14.5.0">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="NuGet.Protocol" Version="6.14.0" />
+    <PackageReference Include="Serilog.Extensions.Logging" Version="9.0.2" />
     <PackageReference Include="Serilog.Sinks.Console" Version="6.0.0" />
     <PackageReference Include="Skyline.DataMiner.CICD.FileSystem" Version="1.4.0" />
-    <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
+    <PackageReference Include="System.CommandLine.Hosting" Version="0.4.0-alpha.22272.1" />
+
+    <PackageReference Include="System.ServiceModel.Http" Version="8.*" />
+    <PackageReference Include="System.ServiceModel.NetTcp" Version="8.*" />
+    <PackageReference Include="System.ServiceModel.Primitives" Version="8.*" />
   </ItemGroup>
 
   <ItemGroup>
     <InternalsVisibleTo Include="CICD.Tools.PackageSignTests" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Using Include="Microsoft.Extensions.Configuration" />
+    <Using Include="Microsoft.Extensions.Logging" />
+    <Using Include="Skyline.DataMiner.CICD.FileSystem.DirectoryInfoWrapper" />
+    <Using Include="Skyline.DataMiner.CICD.FileSystem.DirectoryInfoWrapper.DirectoryInfo">
+      <Alias>DirectoryInfo</Alias>
+    </Using>
+    <Using Include="Skyline.DataMiner.CICD.FileSystem.FileInfoWrapper" />
+    <Using Include="Skyline.DataMiner.CICD.FileSystem.FileInfoWrapper.FileInfo">
+      <Alias>FileInfo</Alias>
+    </Using>
+    <Using Include="Skyline.DataMiner.CICD.FileSystem.FileSystemInfoWrapper" />
+    <Using Include="System.CommandLine" />
+    <Using Include="System.CommandLine.Invocation" />
+    <Using Include="System.CommandLine.Parsing" />
   </ItemGroup>
 
 </Project>

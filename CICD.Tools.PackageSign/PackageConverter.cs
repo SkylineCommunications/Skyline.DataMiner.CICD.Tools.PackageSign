@@ -5,36 +5,36 @@
 
     using Skyline.DataMiner.CICD.FileSystem;
 
-    internal static class DmappConverter
+    internal static class PackageConverter
     {
-        public static string ConvertToDmapp(string path, string outputDirectory, string fileName)
+        public static string ConvertToPackage(string path, string outputDirectory, string fileName)
         {
-            ArgumentNullException.ThrowIfNull(path, nameof(path));
-            ArgumentNullException.ThrowIfNull(outputDirectory, nameof(outputDirectory));
-            ArgumentNullException.ThrowIfNull(fileName, nameof(fileName));
+            ArgumentNullException.ThrowIfNull(path);
+            ArgumentNullException.ThrowIfNull(outputDirectory);
+            ArgumentNullException.ThrowIfNull(fileName);
 
-            string extension = FileSystem.Instance.Path.GetExtension(path);
+            string pathExtension = FileSystem.Instance.Path.GetExtension(path);
 
-            if (!extension.Equals(".nupkg"))
+            if (!pathExtension.Equals(".nupkg"))
             {
-                throw new ArgumentException($"The file extension '{extension}' is not supported. Only '.nupkg' files are supported.");
+                throw new ArgumentException($"The file extension '{pathExtension}' is not supported. Only '.nupkg' files are supported.");
             }
-            
-            string newPath = FileSystem.Instance.Path.Combine(outputDirectory, $"{fileName}.dmapp");
+
+            string newPath = FileSystem.Instance.Path.Combine(outputDirectory, fileName);
             FileSystem.Instance.File.Copy(path, newPath, true);
             return newPath;
         }
 
-        public static string ConvertToNupgk(string path, string outputDirectory)
+        public static string ConvertToNupkg(string path, string outputDirectory)
         {
-            ArgumentNullException.ThrowIfNull(path, nameof(path));
-            ArgumentNullException.ThrowIfNull(outputDirectory, nameof(outputDirectory));
+            ArgumentNullException.ThrowIfNull(path);
+            ArgumentNullException.ThrowIfNull(outputDirectory);
 
             string extension = FileSystem.Instance.Path.GetExtension(path);
 
-            if (!extension.Equals(".dmapp"))
+            if (!extension.Equals(".dmapp") && !extension.Equals(".dmprotocol"))
             {
-                throw new ArgumentException($"The file extension '{extension}' is not supported. Only '.dmapp' files are supported.");
+                throw new ArgumentException($"The file extension '{extension}' is not supported. Only '.dmapp' and '.dmprotocol' files are supported.");
             }
             
             string newPath = FileSystem.Instance.Path.Combine(outputDirectory, FileSystem.Instance.Path.GetFileNameWithoutExtension(path) + ".nupkg");
@@ -44,14 +44,14 @@
 
         public static void AddNuspecFileToPackage(string path)
         {
-            ArgumentNullException.ThrowIfNull(path, nameof(path));
+            ArgumentNullException.ThrowIfNull(path);
 
             string packageName = FileSystem.Instance.Path.GetFileNameWithoutExtension(path);
-            using System.IO.FileStream fileStream = FileSystem.Instance.File.Open(path, System.IO.FileMode.Open);
+            using FileStream fileStream = FileSystem.Instance.File.Open(path, FileMode.Open);
             using ZipArchive archive = new ZipArchive(fileStream, ZipArchiveMode.Update);
             ZipArchiveEntry entry = archive.CreateEntry($"{packageName}.nuspec");
 
-            using var writer = new System.IO.StreamWriter(entry.Open());
+            using var writer = new StreamWriter(entry.Open());
             string nuspecContent = $"<?xml version=\"1.0\" encoding=\"utf-8\"?>{Environment.NewLine}" +
                                    $"<package xmlns=\"http://schemas.microsoft.com/packaging/2010/07/nuspec.xsd\">{Environment.NewLine}" +
                                    $"    <metadata>{Environment.NewLine}" +
