@@ -2,7 +2,7 @@
 
 ## About
 
-This .NET tool allows you to sign and verify DataMiner application (.dmapp) packages.
+This .NET tool allows you to sign and verify DataMiner application (.dmapp) and protocol (.dmprotocol) packages.
 
 ## Projects
 
