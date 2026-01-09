@@ -15,7 +15,7 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
     internal class SignDmappCommand : BaseCommand
     {
         public SignDmappCommand() :
-            base(name: "dmapp", description: "Signs a DataMiner application (.dmapp) package using a code-signing certificate stored in Azure Key Vault." + Environment.NewLine +
+            base(name: "dmapp", description: "Signs a DataMiner application (.dmapp) and DataMiner test (.dmtest) package using a code-signing certificate stored in Azure Key Vault." + Environment.NewLine +
                                              "Environment variables 'AZURE_TENANT_ID', 'AZURE_CLIENT_ID', 'AZURE_CLIENT_SECRET', 'AZURE_KEY_VAULT_URL' and 'AZURE_KEY_VAULT_CERTIFICATE' can be set or provided via the parameters." + Environment.NewLine +
                                              "This is a Windows-Only command.")
         {
@@ -53,9 +53,10 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Sign
                 {
                     case DirectoryInfo directory:
                         packages = new List<IFileInfoIO>(directory.GetFiles("*.dmapp", SearchOption.AllDirectories));
+                        packages.AddRange(directory.GetFiles("*.dmtest", SearchOption.AllDirectories));
                         break;
                     case FileInfo file:
-                        if (file.Extension != ".dmapp")
+                        if (file.Extension != ".dmapp" && file.Extension != ".dmtest")
                         {
                             return (int)ExitCodes.InvalidFileType;
                         }

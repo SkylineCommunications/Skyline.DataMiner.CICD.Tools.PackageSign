@@ -42,9 +42,10 @@ namespace Skyline.DataMiner.CICD.Tools.PackageSign.Commands.Verify
                 {
                     case DirectoryInfo directory:
                         packages = new List<IFileInfoIO>(directory.GetFiles("*.dmapp", SearchOption.AllDirectories));
+                        packages.AddRange(directory.GetFiles("*.dmtest", SearchOption.AllDirectories));
                         break;
                     case FileInfo file:
-                        if (file.Extension != ".dmapp")
+                        if (file.Extension != ".dmapp" && file.Extension != ".dmtest")
                         {
                             return (int)ExitCodes.InvalidFileType;
                         }

@@ -29,7 +29,9 @@
         }
 
         [TestMethod]
-        public void VerifyAsyncTest_NonSignedPackage_ShouldReturn1()
+        [DataRow("Project7.1.0.0.dmapp")]
+        [DataRow("Project7.1.0.0.dmtest")]
+        public void VerifyAsyncTest_NonSignedPackage_ShouldReturn1(string fileName)
         {
             if (configuration == null)
             {
@@ -38,7 +40,7 @@
             }
 
             // Arrange
-            var dmappLocation = new FileInfo(FileSystem.Instance.Path.Combine(TestHelper.GetTestFilesDirectory(), "Project7.1.0.0.dmapp"));
+            var dmappLocation = new FileInfo(FileSystem.Instance.Path.Combine(TestHelper.GetTestFilesDirectory(), fileName));
             SigningZipVariables variables = new(configuration);
             variables.SetAzureCredentials();
             variables.SetAzureKeyVaultVariables();
@@ -102,7 +104,9 @@
         }
 
         [TestMethod]
-        public void SignAsyncTest_NonSignedPackage_ShouldBeAbleToVerify()
+        [DataRow("Project7.1.0.0.dmapp")]
+        [DataRow("Project7.1.0.0.dmtest")]
+        public void SignAsyncTest_NonSignedPackage_ShouldBeAbleToVerify(string fileName)
         {
             if (configuration == null)
             {
@@ -112,7 +116,7 @@
 
             // Arrange
             var temporaryDirectory = new DirectoryInfo(FileSystem.Instance.Directory.CreateTemporaryDirectory());
-            var dmappLocation = new FileInfo(FileSystem.Instance.Path.Combine(TestHelper.GetTestFilesDirectory(), "Project7.1.0.0.dmapp"));
+            var dmappLocation = new FileInfo(FileSystem.Instance.Path.Combine(TestHelper.GetTestFilesDirectory(), fileName));
             SigningZipVariables variables = new(configuration);
             variables.SetAzureCredentials();
             variables.SetAzureKeyVaultVariables();
@@ -126,7 +130,7 @@
                 // Assert
                 int returnValue = result.Should().NotThrow().Subject;
                 returnValue.Should().Be(0);
-                var signedPackageLocation = new FileInfo(FileSystem.Instance.Path.Combine(temporaryDirectory.FullName, "Project7.1.0.0.dmapp"));
+                var signedPackageLocation = new FileInfo(FileSystem.Instance.Path.Combine(temporaryDirectory.FullName, fileName));
                 signedPackageLocation.Exists.Should().BeTrue();
                 
                 int verifyResult = VerifyDmappCommandHandler.VerifyInternalAsync(variables, signedPackageLocation, logger).WaitAndUnwrapException();
