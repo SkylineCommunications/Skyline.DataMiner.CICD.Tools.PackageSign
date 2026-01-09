@@ -32,9 +32,9 @@
 
             string extension = FileSystem.Instance.Path.GetExtension(path);
 
-            if (!extension.Equals(".dmapp") && !extension.Equals(".dmprotocol"))
+            if (!extension.Equals(".dmapp") && !extension.Equals(".dmtest") && !extension.Equals(".dmprotocol"))
             {
-                throw new ArgumentException($"The file extension '{extension}' is not supported. Only '.dmapp' and '.dmprotocol' files are supported.");
+                throw new ArgumentException($"The file extension '{extension}' is not supported. Only '.dmapp', '.dmtest' and '.dmprotocol' files are supported.");
             }
             
             string newPath = FileSystem.Instance.Path.Combine(outputDirectory, FileSystem.Instance.Path.GetFileNameWithoutExtension(path) + ".nupkg");
