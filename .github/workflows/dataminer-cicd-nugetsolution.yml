@@ -29,9 +29,10 @@ jobs:
 
   CICD:
     needs: [dotnet-test]
-    uses: SkylineCommunications/_ReusableWorkflows/.github/workflows/NuGet Solution Master Workflow.yml@main
+    uses: SkylineCommunications/_ReusableWorkflows/.github/workflows/Master Workflow.yml@main
     with:
-      sonarCloudProjectName: SkylineCommunications_Skyline.DataMiner.CICD.Tools.PackageSign
+      sonarcloud-project-name: SkylineCommunications_Skyline.DataMiner.CICD.Tools.PackageSign
+      nuget-push-source: "https://api.nuget.org/v3/index.json"
     secrets:
-      nugetApiKey: ${{ secrets.NUGETAPIKEY }}
+      NUGET_API_KEY: ${{ secrets.NUGETAPIKEY }}
       
